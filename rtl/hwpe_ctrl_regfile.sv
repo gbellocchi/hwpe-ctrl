@@ -13,6 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
+`define FPGA_SYNTHESIS
 
 module hwpe_ctrl_regfile
   import hwpe_ctrl_package::*;
@@ -100,6 +101,7 @@ module hwpe_ctrl_regfile
   generate
     logic [N_CONTEXT-1:0]                  wren_cxt;
 
+`ifdef ASIC_SYNTHESIS
     hwpe_ctrl_regfile_latch_test_wrap #(
       .ADDR_WIDTH(SCM_ADDR_WIDTH),
       .DATA_WIDTH(32)
@@ -125,6 +127,35 @@ module hwpe_ctrl_regfile
       .BE_T       (                                 ),
       .Q_T        (                                 )
     );
+`endif
+
+`ifdef FPGA_SYNTHESIS
+    hwpe_ctrl_regfile_ff_wrap #(
+      .ADDR_WIDTH(SCM_ADDR_WIDTH),
+      .DATA_WIDTH(32)
+    ) i_regfile_ff (
+      .clk        ( clk_i                           ),
+      .rst_n      ( rst_ni                          ),
+      .clear      ( clear_i | r_clear_first_startup ),
+      .ReadEnable ( regfile_latch_re                ),
+      .ReadAddr   ( regfile_latch_rd_addr           ),
+      .ReadData   ( regfile_latch_rdata             ),
+
+      .WriteAddr  ( regfile_latch_wr_addr           ),
+      .WriteEnable( regfile_latch_we                ),
+      .WriteData  ( regfile_latch_wdata             ),
+      .WriteBE    ( regfile_latch_be                ),
+      .MemContent ( regfile_latch_mem               ),
+
+      .BIST       ( 1'b0                            ),
+      .CSN_T      (                                 ),
+      .WEN_T      (                                 ),
+      .A_T        (                                 ),
+      .D_T        (                                 ),
+      .BE_T       (                                 ),
+      .Q_T        (                                 )
+    );
+`endif
 
     for(i=0; i<N_CONTEXT; i++)
     begin
