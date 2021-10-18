@@ -130,7 +130,7 @@ module hwpe_ctrl_regfile
 `endif
 
 `ifdef FPGA_SYNTHESIS
-    hwpe_ctrl_regfile_ff_wrap #(
+    hwpe_ctrl_regfile_ff_test_wrap #(
       .ADDR_WIDTH(SCM_ADDR_WIDTH),
       .DATA_WIDTH(32)
     ) i_regfile_ff (
